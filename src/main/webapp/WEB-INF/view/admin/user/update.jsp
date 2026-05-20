@@ -22,31 +22,28 @@
             <div class="container mt-5">
                 <div class="row">
                     <div class="col-md-6 col-12 mx-auto">
-                        <h3>Create a user</h3>
+                        <h3>Update a user</h3>
                         <hr/>
-                        <form  method="post" action="/admin/user/create">
+                        <form:form  method="post" action="/admin/user/update/${user.id}" modelAttribute="user">
+                            <form:hidden path="id" />
                             <div class="mb-3">
-                                <label class="form-label">Email address</label>
-                                <input type="email" class="form-control" name="email">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password">
+                                <label class="form-label">Email</label>
+                                <form:input type="email" class="form-control" path="email" readonly="true"/>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Fullname</label>
-                                <input class="form-control" name="fullName">
+                                <form:input class="form-control" path="fullName"/>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Address</label>
-                                <input class="form-control" name="address">
+                                <form:input class="form-control" path="address"/>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
-                                <input type="number" class="form-control" name="phone">
+                                <form:input type="number" class="form-control" path="phone"/>
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
+                        </form:form>
                     </div>
                 </div>
             </div>
