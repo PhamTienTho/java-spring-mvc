@@ -23,9 +23,6 @@ import vn.hoidanit.laptopshop.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
-
-
-
 @Controller
 public class HomePageController {
 

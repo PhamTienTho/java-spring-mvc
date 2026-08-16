@@ -38,7 +38,6 @@ public class SecurityConfiguration {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
-        // authProvider.setHideUserNotFoundExceptions(false);
 
         return authProvider;
     }
@@ -52,8 +51,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
         http
+                .authenticationProvider(authProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
                         .requestMatchers("/", "/login", "/register", "/product/**", "/client/**", "/css/**", "/js/**", "/images/**")
