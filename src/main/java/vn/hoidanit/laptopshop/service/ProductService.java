@@ -21,6 +21,8 @@ import vn.hoidanit.laptopshop.domain.Order;
 import vn.hoidanit.laptopshop.domain.OrderDetail;
 
 import java.util.Optional;
+import java.util.UUID;
+
 import vn.hoidanit.laptopshop.repository.CartDetailRepository;
 import vn.hoidanit.laptopshop.repository.CartRepository;
 import vn.hoidanit.laptopshop.repository.OrderDetailRepository;
@@ -323,7 +325,7 @@ public class ProductService {
     }
 
     public void handlePlaceOrder(User user, String receiverName, String receiverAddress, String receiverPhone,
-            HttpSession session) {
+            String paymentMethod , String uuid, HttpSession session) {
         Order order = new Order();
 
         order.setUser(user);
@@ -331,6 +333,10 @@ public class ProductService {
         order.setReceiverAddress(receiverAddress);
         order.setReceiverPhone(receiverPhone);
         order.setStatus("PENDING");
+
+        order.setPaymentMethod(paymentMethod);
+        order.setPaymentStatus("PAYMENT_UNPAID");
+        order.setPaymentRef(paymentMethod.equals("COD") ? "UNKNOWN" : uuid);
 
         order = this.orderRepository.save(order);
 
@@ -358,5 +364,15 @@ public class ProductService {
         order.setTotalPrice(totalPrice);
         this.orderRepository.save(order);
 
+    }
+
+     public void updatePaymentStatus(String paymentRef, String paymentStatus) {
+        Optional<Order> orderOptional = this.orderRepository.findByPaymentRef(paymentRef);
+        if (orderOptional.isPresent()) {
+            // update
+            Order order = orderOptional.get();
+            order.setPaymentStatus(paymentStatus);
+            this.orderRepository.save(order);
+        }
     }
 }

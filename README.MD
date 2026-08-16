@@ -35,7 +35,9 @@ Dự án website bán laptop được xây dựng theo mô hình MVC với Sprin
   - Sắp xếp theo giá tăng/giảm dần
   - Phân trang — giữ nguyên bộ lọc khi chuyển trang
 - **Giỏ hàng**: Thêm sản phẩm, cập nhật số lượng, xóa sản phẩm
-- **Đặt hàng**: Checkout, nhập thông tin giao hàng
+- **Đặt hàng & Thanh toán**: 
+  - Đặt hàng COD truyền thống, nhập thông tin giao hàng
+  - Tích hợp thanh toán trực tuyến qua cổng **VNPAY** (tự động chuyển hướng và xử lý kết quả trả về)
 - **Lịch sử đơn hàng**: Xem danh sách đơn đã đặt
 
 ### Phía quản trị (Admin)
@@ -64,6 +66,7 @@ Dự án website bán laptop được xây dựng theo mô hình MVC với Sprin
 - **File Upload** — upload và lưu ảnh sản phẩm / avatar (tối đa 50MB)
 - **Bean Validation** — validate dữ liệu form phía server
 - **RESTful endpoint** — API JSON (`@ResponseBody`) cho tính năng cập nhật giỏ hàng (AJAX)
+- **Tích hợp API VNPAY** — Mã hóa tham số, tạo chữ ký bảo mật (Secure Hash SHA-512) chống giả mạo, thiết lập Return URL / IPN để xử lý callback đơn hàng.
 
 ---
 
@@ -86,4 +89,4 @@ Dự án website bán laptop được xây dựng theo mô hình MVC với Sprin
    ```bash
    ./mvnw spring-boot:run
    ```
-4. Truy cập: `http://localhost:8081`
+4. Truy cập: `http://localhost:8082`

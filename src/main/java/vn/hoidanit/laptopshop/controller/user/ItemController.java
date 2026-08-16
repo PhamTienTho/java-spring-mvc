@@ -1,8 +1,10 @@
 package vn.hoidanit.laptopshop.controller.user;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ import vn.hoidanit.laptopshop.repository.CartRepository;
 import vn.hoidanit.laptopshop.repository.OrderRepository;
 import vn.hoidanit.laptopshop.service.CustomUserDetails;
 import vn.hoidanit.laptopshop.service.ProductService;
+import vn.hoidanit.laptopshop.service.VNPayService;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,13 +42,15 @@ public class ItemController {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ProductService productService;
+    private final VNPayService vNPayService;
 
     public ItemController(ProductService productService, CartRepository cartRepository,
-            OrderRepository orderRepository, CartDetailRepository cartDetailRepository) {
+            OrderRepository orderRepository, CartDetailRepository cartDetailRepository, VNPayService vnPayService) {
         this.productService = productService;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
         this.cartDetailRepository = cartDetailRepository;
+        this.vNPayService = vnPayService;
     }
 
     @GetMapping("/product/{id}")
@@ -135,20 +141,38 @@ public class ItemController {
 
     @PostMapping("/place-order")
     public String handlePlaceOrder(
+            HttpServletRequest request,
             @RequestParam("receiverName") String receiverName,
             @RequestParam("receiverAddress") String receiverAddress,
-            @RequestParam("receiverPhone") String receiverPhone, @AuthenticationPrincipal CustomUserDetails userDetails,
-            HttpSession session) {
+            @RequestParam("receiverPhone") String receiverPhone,
+            @RequestParam("paymentMethod") String paymentMethod,
+            @RequestParam("totalPrice") String totalPrice, @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session) throws UnsupportedEncodingException {
 
         User user = new User();
         user.setId(userDetails.getId());
 
-        this.productService.handlePlaceOrder(user, receiverName, receiverAddress, receiverPhone, session);
+        final String uuid = UUID.randomUUID().toString().replace("-", "");
+
+        this.productService.handlePlaceOrder(user, receiverName, receiverAddress, receiverPhone, paymentMethod, uuid,
+                session);
+
+        if (!paymentMethod.equals("COD")) {
+            // todo: redirect to VNPAY
+            String ip = this.vNPayService.getIpAddress(request);
+            String vnpUrl = this.vNPayService.generateVNPayURL(Double.parseDouble(totalPrice), uuid, ip);
+
+            return "redirect:" + vnpUrl;
+        }
+
         return "redirect:/thanks";
     }
 
     @GetMapping("/thanks")
-    public String getThanksPage() {
+    public String getThanksPage(
+            @RequestParam("vnp_ResponseCode") Optional<String> vnpayResponseCode,
+            @RequestParam("vnp_TxnRef") Optional<String> paymentRef) {
+                
         return "client/cart/thanks";
     }
 
